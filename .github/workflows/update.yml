@@ -1,0 +1,47 @@
+name: Actualizacion Diaria del Indice
+
+on:
+  schedule:
+    # 08:00 UTC = 10:00 España (Verano)
+    - cron: '0 8 * * *'
+    # 18:00 UTC = 20:00 España (Verano)
+    - cron: '0 18 * * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub
+
+permissions:
+  contents: write # Necesario para poder hacer commits de los cambios
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clonar el repositorio
+      uses: actions/checkout@v4
+
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install hydrogram tgcrypto pillow python-dotenv
+
+    - name: Ejecutar script de actualización
+      env:
+        API_ID: ${{ secrets.API_ID }}
+        API_HASH: ${{ secrets.API_HASH }}
+        SESSION_STRING: ${{ secrets.SESSION_STRING }}
+      run: |
+        python generar_indice.py
+
+    - name: Guardar y subir cambios (Commit & Push)
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add indice_libros.json indice_libros.html
+        
+        # Solo hace commit si hay cambios reales
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Automatización: Índice actualizado [skip ci]" && git push)
