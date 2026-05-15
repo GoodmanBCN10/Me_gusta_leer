@@ -269,7 +269,7 @@ def generate_html(items):
     <script>
         const allItems = {json_data};
         let filteredItems = allItems;
-        let currentFilter = 'ALL';
+        let currentFilter = 'NOVEDADES';
 
         const alphabetContainer = document.getElementById('alphabet');
         const searchInput = document.getElementById('search');
@@ -277,11 +277,11 @@ def generate_html(items):
         const counterInfo = document.getElementById('counter-info');
 
         // Generar botones A-Z
-        const letters = ['TODO', '#', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+        const letters = ['NOVEDADES', 'TODO', '#', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
         letters.forEach(l => {{
             const btn = document.createElement('button');
             btn.className = 'letter-btn';
-            if (l === 'TODO') btn.classList.add('active');
+            if (l === 'NOVEDADES') btn.classList.add('active');
             btn.innerText = l;
             btn.onclick = () => filterByLetter(l, btn);
             alphabetContainer.appendChild(btn);
@@ -297,13 +297,18 @@ def generate_html(items):
 
         searchInput.addEventListener('input', () => {{
             document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector('.letter-btn').classList.add('active'); // Seleccionar 'TODO' visualmente
-            currentFilter = 'SEARCH';
+            if (!searchInput.value.trim()) {{
+                document.querySelector('.letter-btn').classList.add('active');
+                currentFilter = 'NOVEDADES';
+            }} else {{
+                currentFilter = 'SEARCH';
+            }}
             applyFilters();
         }});
 
         function applyFilters() {{
             const term = searchInput.value.toLowerCase().trim();
+            let isHome = false;
             
             filteredItems = allItems.filter(item => {{
                 // Filtro de búsqueda
@@ -312,6 +317,10 @@ def generate_html(items):
                 }}
                 
                 // Filtro por letras
+                if (currentFilter === 'NOVEDADES') {{
+                    isHome = true;
+                    return true;
+                }}
                 if (currentFilter === 'TODO') return true;
                 
                 const firstChar = item.title.charAt(0).toUpperCase();
@@ -321,8 +330,17 @@ def generate_html(items):
                 return firstChar === currentFilter;
             }});
 
-            // Ordenar alfabéticamente
-            filteredItems.sort((a, b) => a.title.localeCompare(b.title));
+            if (isHome && !term) {{
+                // Ordenar por fecha y sacar los 10 más recientes
+                filteredItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+                filteredItems = filteredItems.slice(0, 10);
+                counterInfo.innerText = "Últimas novedades: 10 libros añadidos recientemente";
+            }} else {{
+                // Ordenar alfabéticamente
+                filteredItems.sort((a, b) => a.title.localeCompare(b.title));
+                counterInfo.innerText = `Mostrando ${{filteredItems.length}} publicaciones`;
+            }}
+            
             renderGrid();
         }}
 
@@ -347,7 +365,6 @@ def generate_html(items):
             }});
             
             grid.appendChild(fragment);
-            counterInfo.innerText = `Mostrando ${{filteredItems.length}} de ${{allItems.length}} publicaciones`;
         }}
 
         // Inicializar
