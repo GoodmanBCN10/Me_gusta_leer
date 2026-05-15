@@ -17,7 +17,7 @@ load_dotenv()
 API_ID = os.getenv('API_ID')
 API_HASH = os.getenv('API_HASH')
 CHANNEL_ID = -1002923573607
-HTML_OUTPUT = "indice_libros.html"
+HTML_OUTPUT = "index.html"
 DB_FILE = "indice_libros.json"
 
 # Para asegurarnos de que usa la sesión existente en src/
