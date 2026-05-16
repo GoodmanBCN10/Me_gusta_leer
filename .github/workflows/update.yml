@@ -1,9 +1,9 @@
 name: Actualizacion Diaria del Indice
 
 on:
-    schedule:
-# Ejecuta cada 4 horas
-- cron: '0 */4 * * *'
+  schedule:
+    # Ejecuta cada 4 horas
+    - cron: '0 */4 * * *'
 
   workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub
 
