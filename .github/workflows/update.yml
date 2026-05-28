@@ -2,8 +2,8 @@ name: Actualizacion Diaria del Indice
 
 on:
   schedule:
-    # Ejecuta a las 07:15 y 19:15 (hora de España)
-    - cron: '15 5,17 * * *'
+    # Ejecuta a las 07:15, 14:15, 19:15 y 23:15 (hora de España)
+    - cron: '15 5,12,17,21 * * *'
   workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub
 
 permissions:
