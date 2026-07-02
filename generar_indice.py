@@ -22,6 +22,7 @@ DB_FILE = "indice_libros.json"
 
 # Para asegurarnos de que usa la sesión existente en src/
 # Pasamos la ruta relativa "src/my_session", o el STRING_SESSION si estamos en GitHub
+asyncio.set_event_loop(asyncio.new_event_loop())
 SESSION_STRING = os.getenv('SESSION_STRING')
 if SESSION_STRING:
     app = Client("memory_session", session_string=SESSION_STRING, api_id=API_ID, api_hash=API_HASH)
